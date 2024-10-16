@@ -1,0 +1,20 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#nft-container {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.property {
+    margin-bottom: 10px;
+}
+
+.property-key {
+    font-weight: bold;
+}
