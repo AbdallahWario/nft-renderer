@@ -6,3 +6,5 @@ dist/
 build/
 *.tmp
 *.log
+
+.parcel-cache/
