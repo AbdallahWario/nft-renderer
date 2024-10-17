@@ -2,7 +2,7 @@ export async function renderNFT(metadata) {
     const parser = new DOMParser();
     const serializer = new XMLSerializer();
 
-    // Pre-process the metadata to handle SVG in image field
+    // Pre-process the metadata to handle SVG in the image field
     if (metadata.image) {
         metadata.image = await processSVGImage(metadata.image);
     }
@@ -12,6 +12,8 @@ export async function renderNFT(metadata) {
     const nftElement = xmlDoc.documentElement;
 
     function createValidElementName(key) {
+        // Ensure valid element names, adding an underscore if the key starts with a number
+        // and replacing invalid characters with underscores
         if (/^[0-9]/.test(key)) {
             return '_' + key;
         }
@@ -22,7 +24,7 @@ export async function renderNFT(metadata) {
     async function processSVGImage(imageContent) {
         if (!imageContent) return imageContent;
 
-        // Handle base64 encoded SVG
+        // Handle base64-encoded SVG
         if (imageContent.startsWith('data:image/svg+xml;base64,')) {
             try {
                 const base64Content = imageContent.split(',')[1];
@@ -59,21 +61,25 @@ export async function renderNFT(metadata) {
     }
 
     function addMetadataToElement(obj, parentElement) {
+        // Loop through each metadata key-value pair
         for (const [key, value] of Object.entries(obj)) {
             const validKey = createValidElementName(key);
+
+            // Recursively add child elements for nested objects
             if (typeof value === 'object' && value !== null) {
                 const subElement = xmlDoc.createElement(validKey);
                 addMetadataToElement(value, subElement);
                 parentElement.appendChild(subElement);
             } else {
+                // Add metadata as text nodes
                 const element = xmlDoc.createElement(validKey);
-                
+
                 // Special handling for SVG content
                 if (typeof value === 'string' && value.toLowerCase().includes('<svg')) {
                     try {
                         const svgDoc = parser.parseFromString(value, 'image/svg+xml');
                         if (!svgDoc.querySelector('parsererror')) {
-                            // For image field, add wrapper to control SVG size
+                            // Wrap SVG content and append it to the element
                             if (key === 'image') {
                                 const wrapper = document.createElement('div');
                                 wrapper.style.maxWidth = '100%';
@@ -103,14 +109,13 @@ export async function renderNFT(metadata) {
     console.log('XML Document:', serializer.serializeToString(xmlDoc));
 
     try {
-        // Attempt XSLT transformation
+        // Attempt to fetch and process the XSLT file for transformation
         const xsltResponse = await fetch('nft-renderer.xslt');
-        
         if (!xsltResponse.ok) {
             throw new Error(`Failed to fetch XSLT: ${xsltResponse.status} ${xsltResponse.statusText}`);
         }
         const xsltText = await xsltResponse.text();
-        
+
         if (!xsltText.includes('<xsl:stylesheet') && !xsltText.includes('<xsl:transform')) {
             throw new Error('The fetched file does not appear to be a valid XSLT document');
         }
@@ -120,6 +125,7 @@ export async function renderNFT(metadata) {
             throw new Error("XSLT parse error: " + xsltDoc.documentElement.textContent);
         }
 
+        // Ensure the XSLT document has a valid root element
         const isValidXSLT = xsltDoc.documentElement.tagName === "stylesheet" ||
                            xsltDoc.documentElement.tagName === "transform" ||
                            xsltDoc.documentElement.tagName === "xsl:stylesheet" ||
@@ -129,6 +135,7 @@ export async function renderNFT(metadata) {
             throw new Error("Invalid XSLT document: Root element should be 'stylesheet' or 'transform'");
         }
 
+        // Apply XSLT transformation
         const xsltProcessor = new XSLTProcessor();
         xsltProcessor.importStylesheet(xsltDoc);
         const resultDoc = xsltProcessor.transformToDocument(xmlDoc);
@@ -147,6 +154,7 @@ export async function renderNFT(metadata) {
 }
 
 function renderResult(element) {
+    // Render the final transformed result into the container element
     const container = document.getElementById('nft-container');
     if (!container) {
         console.error("Container 'nft-container' not found");
@@ -157,6 +165,7 @@ function renderResult(element) {
 }
 
 function renderFallback(nftElement) {
+    // Render a fallback HTML structure in case of an error in transformation
     const container = document.getElementById('nft-container');
     if (!container) {
         console.error("Container 'nft-container' not found");
@@ -170,7 +179,7 @@ function renderFallback(nftElement) {
         const div = document.createElement('div');
         div.className = `nft-${element.tagName.toLowerCase()}`;
         
-        // Special handling for image element containing SVG
+        // Handle SVG content in image elements
         if (element.tagName.toLowerCase() === 'image' && element.querySelector('svg')) {
             const wrapper = document.createElement('div');
             wrapper.style.maxWidth = '100%';
@@ -178,16 +187,15 @@ function renderFallback(nftElement) {
             wrapper.appendChild(element.querySelector('svg').cloneNode(true));
             div.appendChild(wrapper);
         } else if (element.querySelector('svg')) {
-            // For other elements containing SVG
             div.appendChild(element.querySelector('svg').cloneNode(true));
         } else if (element.childNodes.length === 0 || (element.childNodes.length === 1 && element.childNodes[0].nodeType === 3)) {
-            // Text content or empty element
+            // Handle simple text content or empty elements
             const label = document.createElement('strong');
             label.textContent = element.tagName + ': ';
             div.appendChild(label);
             div.appendChild(document.createTextNode(element.textContent));
         } else {
-            // Element with child elements
+            // Handle elements with child elements
             const label = document.createElement('strong');
             label.textContent = element.tagName + ':';
             div.appendChild(label);
