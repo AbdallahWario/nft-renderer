@@ -3,13 +3,12 @@ export async function fetchMetadataFromWala(identifier) {
         throw new Error('tokenURI is required');
     }
 
-    // Set Wala base URL for fetching metadata
-    const baseUrl = '';
+    const baseUrl = 'wala url goes here';
     const url = `${baseUrl}/${identifier}`;
 
     try {
         const response = await fetch(url);
-
+        
         if (!response.ok) {
             throw new Error(`Failed to fetch metadata from Wala: ${response.status} - ${response.statusText}`);
         }

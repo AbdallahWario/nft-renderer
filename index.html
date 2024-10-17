@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NFT Renderer</title>
-    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.8.1/ethers.umd.min.js"></script>
+  
 </head>
 <body>
-    <h1>NFT Renderer</h1>
-    <div id="nft-container"></div>
+    <div id="nft-container" class="nft-container">
+        <p>Loading NFT data...</p>
+    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" integrity="sha512-V3xRGsQMQ8CG4l2gVN44TCDmNY5cdlxbSvejrgmWxcLKHft0Q3XQDbeuJ9aot14mpNuRWGtI//WKraedDGNZ+g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
-    <script type="module" src="blockchain-connector.js"></script>
-    <script  type="module" src="wala-connector.js"></script>
-    <script type="module" src="renderer.js"></script>
-    <script type="module" src="main.js"></script>
+    <script src="blockchain-connector.js" type="module"></script>
+    <script src="wala-connector.js" type="module"></script>
+    <script src="renderer.js" type="module"></script>
+    <script src="main.js" type="module"></script>
 </body>
 </html>

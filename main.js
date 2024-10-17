@@ -1,10 +1,11 @@
-import { fetchTokenURI} from './blockchain-connector.js'
-import { fetchMetadataFromWala } from './wala-connector.js'
-import { renderNFT } from './renderer.js'
+import { fetchTokenURI } from './blockchain-connector.js';
+import { fetchMetadataFromWala } from './wala-connector.js';
+import { renderNFT } from './renderer.js';
+
 // Config variables
 let NFTId = '';
-let NFTAddress = '0x45929352A7CE71c3E00B827af789126966795fC9';
-const RPCURL = 'https://celo-mainnet.infura.io/v3/fc943bf6283f48688421c272f476e534'; 
+let NFTAddress = '';
+const RPCURL = 'address to your rpc url e.g celo'; 
 
 // Function to get URL parameters
 function getUrlParams() {
@@ -27,7 +28,7 @@ async function checkXSLTFile() {
 }
 
 async function initRenderer() {
-    await checkXSLTFile()
+    await checkXSLTFile();
     getUrlParams();
     try {
         if (!NFTId || !NFTAddress) {
@@ -60,7 +61,7 @@ async function initRenderer() {
         console.error('Error in initRenderer:', error);
         const container = document.getElementById('nft-container');
         if (container) {
-            container.innerHTML = `<p>Error initializing renderer: ${error.message}</p>`;
+            container.innerHTML = `<p class="error">Error initializing renderer: ${error.message}</p>`;
         } else {
             console.error("Container 'nft-container' not found for error display");
         }
